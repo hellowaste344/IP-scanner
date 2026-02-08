@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <thread>
 #include <map>
 #include <vector>
@@ -9,6 +11,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <getopt.h>
 using namespace std;
 
 const map<int, string> PORTS = {
@@ -51,6 +54,25 @@ string getService(int port){
     auto it = PORTS.find(port);
     // condition ? value_if_true : value_if_false
     return it != PORTS.end() ? it->second : "Unkown";
+}
+
+string get_mac_address(const string &ip){
+    ifstream arp("/proc/net/arp");
+    string line;
+    // skip header
+    getline(arp, line);
+    while(getline(arp, line)){
+        istringstream iss(line);
+        string ip_addr, hw_type, flags, mac, mask, device;
+
+        if(!(iss >> ip_addr >> hw_type >> flags >> mac >> mask >> device))
+            continue;
+
+        if(ip_addr == ip){
+            return mac;
+        }
+    }
+    return "No MAC address found\n";
 }
 
 // Mutex for thread-safe output
@@ -105,7 +127,7 @@ void scan_ports(const string &ip, const vector<int> &ports){
 
 int main(int argc, char* argv[]){
     if(argc < 2){
-        cerr << "Usage: ./ipscan <target_ip> [ports...]\n";
+        cerr << "Usage: ./ipscan <target_ip> [ports...] for help use -h\n";
         return 1;
     }
     string target_ip = argv[1];
@@ -144,10 +166,12 @@ int main(int argc, char* argv[]){
 
     auto start_time = chrono::high_resolution_clock::now();
     cout << "Scanning "<< ports_to_scan.size() << " ports on " << target_ip << endl;
-
     scan_ports(target_ip, ports_to_scan);
+    system(("ping -c 1 " + target_ip + " > /dev/null 2>&1").c_str());
+    this_thread::sleep_for(chrono::milliseconds(300));
+    cout << "MAC:" << get_mac_address(target_ip);
     auto end_time = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::seconds>(end_time - start_time);
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
     cout << "Scanning completed in " << duration.count() << " seconds.\n";
 
     return 0;
