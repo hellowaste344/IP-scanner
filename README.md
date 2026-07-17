@@ -8,9 +8,14 @@ git clone https://github.com/hellowaste344/IP-scanner.git
 cd IP-scanner
 ```
 
-2. Specify target and ports.
+2. Fresh Compile
+```bash
+g++ ipscan.cpp -o ipscan
+```
+
+3. Specify target and ports.
 ```py
-python cmd.py --target <target ip address> -p <ports to scan> 
+python cmd.py --target <TARGET_IP> -p <PORTS> 
 ```
 
 ## :bulb: PR
@@ -19,6 +24,7 @@ python cmd.py --target <target ip address> -p <ports to scan>
 - improve implementation
 - Suggestions for new features
 - security assesment
+- notify issue & bug
 
 ## :exclamation: Important 
 This project is built for educational purposes under MIT license. **Please beware !**

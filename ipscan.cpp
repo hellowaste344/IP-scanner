@@ -138,7 +138,7 @@ int main(int argc, char* argv[]){
     vector<int> ports_to_scan;
     
     vector<int> common_ports = {
-        21, 22, 23, 25, 53, 80, 110, 139, 143, 443, 445, 3389,
+        21, 22, 23, 25, 53, 80, 110, 139, 143, 443, 445, 587, 993, 3389,
         8080, 8000, 8008, 8888, 3000, 5000,
         5900, 5985, 5986,
         3306, 5432, 6379, 27017, 1433,
@@ -172,10 +172,10 @@ int main(int argc, char* argv[]){
     scan_ports(target_ip, ports_to_scan);
     system(("ping -c 1 " + target_ip + " > /dev/null 2>&1").c_str());
     this_thread::sleep_for(chrono::milliseconds(300));
-    cout << "MAC:" << get_mac_address(target_ip);
+    cout << "MAC:" << get_mac_address(target_ip) << endl;
     auto end_time = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
-    cout << "Scanning completed in " << duration.count() << " seconds.\n";
+    cout << "Scanning completed in " << duration.count() << " milliseconds.\n";
 
     return 0;
 }
